@@ -23,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
+import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView receivedRecyclerView, responseRecyclerView;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler = new Handler(Looper.getMainLooper());
     private RequestQueue requestQueue;
     private static final int PERMISSION_REQUEST_CODE = 100;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(this);
 
-        SMSReceiver.setMainActivity(this);
+        SMSReceiver.setMainActivity(this); // Ensure this is called
 
         checkAndRequestPermissions();
 
@@ -61,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
                 handler.postDelayed(this, 30000);
             }
         }, 30000);
+
+        Log.d(TAG, "MainActivity initialized and RecyclerViews set up");
     }
 
     private void checkAndRequestPermissions() {
@@ -93,7 +97,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateReceivedMessages(List<String> messages) {
-        runOnUiThread(() -> receivedAdapter.updateMessages(messages));
+        Log.d(TAG, "Updating received messages: " + messages.toString());
+        runOnUiThread(() -> {
+            receivedAdapter.updateMessages(messages);
+            Log.d(TAG, "UI updated with new messages");
+        });
     }
 
     private void checkResponses() {

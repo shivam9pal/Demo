@@ -35,11 +35,12 @@ public class SMSReceiver extends BroadcastReceiver {
 
                 if (message != null && message.toLowerCase().startsWith("route")) {
                     receivedMessages.add(message);
+                    Log.d("SMSReceiver", "New message received: " + message);
                     if (mainActivity != null) {
                         mainActivity.updateReceivedMessages(receivedMessages);
                     }
 
-                    String origin = extractAfter(message, "from");
+                    String origin = extractBetween(message, "from", "to");
                     String destination = extractAfter(message, "to");
                     saveToDatabase(mobile, origin, destination);
                 }
@@ -47,8 +48,21 @@ public class SMSReceiver extends BroadcastReceiver {
         }
     }
 
+    private String extractBetween(String message, String startKeyword, String endKeyword) {
+        if (message == null) return "";
+        String lowerMessage = message.toLowerCase();
+        int startIndex = lowerMessage.indexOf(startKeyword) + startKeyword.length();
+        int endIndex = lowerMessage.indexOf(endKeyword, startIndex);
+        if (startIndex >= startKeyword.length() && endIndex > startIndex) {
+            return message.substring(startIndex, endIndex).trim();
+        }
+        return "";
+    }
+
     private String extractAfter(String message, String keyword) {
-        int index = message.toLowerCase().indexOf(keyword) + keyword.length();
+        if (message == null) return "";
+        String lowerMessage = message.toLowerCase();
+        int index = lowerMessage.indexOf(keyword) + keyword.length();
         if (index >= keyword.length() && index < message.length()) {
             return message.substring(index).trim();
         }
